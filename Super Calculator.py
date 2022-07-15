@@ -4,6 +4,8 @@ import sys
 import re
 import math
 import random
+from binascii import hexlify, unhexlify
+from base64 import b64decode, b64encode
 from decimal import *
 
 import sublime
@@ -43,17 +45,44 @@ class SuperCalculatorCommand(sublime_plugin.TextCommand):
             def __repr__(self):
                 return self._func()
 
-        def password(length=10):
-            pwdchrs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        def password(length=16):
+            pwdchrs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghjkmnopqrstuvwxyz0123456789'
             return ''.join(random.choice(pwdchrs) for _ in range(length))
 
+
+
         password = Constant(password)
-        self.callables['pwd'] = password
+        # self.callables['pwd'] = password
         self.callables['password'] = password
-        self.constants['pwd'] = password
-        self.constants['password'] = password
-        self.constants['PWD'] = password
-        self.constants['PASSWORD'] = password
+        # self.constants['pwd'] = password
+        # self.constants['password'] = password
+        # self.constants['PWD'] = password
+        # self.constants['PASSWORD'] = password
+
+
+        def unhex(text):
+            return unhexlify(str(hexlify))
+        def hexlify(text):
+            return hexlify(str(hexlify))
+
+        def intUnhex(num):
+            return unhexlify(int(num))
+        def intHex(num):
+            return hexlify(int(num))
+
+        unhex = Constant(unhex)
+        hexlify = Constant(hexlify)
+        intUnhex = Constant(intUnhex)
+        intHex = Constant(intHex)
+        b64decode = Constant(b64decode)
+        b64encode = Constant(b64encode)
+
+        self.callables['unhex'] = unhex
+        self.callables['hex'] = hexlify
+        self.callables['intunhex'] = intUnhex
+        self.callables['inthex'] = intHex
+        self.callables['b64e'] = b64encode
+        self.callables['b64d'] = b64decode
 
         allowed = '|'.join(
             [r'[-+*/%%()]'] +
