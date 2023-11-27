@@ -45,6 +45,62 @@ class SuperCalculatorCommand(sublime_plugin.TextCommand):
             def __repr__(self):
                 return self._func()
 
+        def generate_flag(flag, flag_len=16):
+            flag = str(flag)
+            alphabet="abcdefghijklmnopqrstuvwxyz"
+            alphabet_capital="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+            dictionary=[
+                ["A","a","4","@"],
+                ["B","b","8","6"],
+                ["C","c"],
+                ["D","d"],
+                ["E","e","3"],
+                ["F","f"],
+                ["G","g","9"],
+                ["H","h"],
+                ["I","i","1"],
+                ["J","j"],
+                ["K","k"],
+                ["L","l","1"],
+                ["M","m"],
+                ["N","n"],
+                ["O","o","0"],
+                ["P","p"],
+                ["Q","q"],
+                ["R","r"],
+                ["S","s","5"],
+                ["T","t","7"],
+                ["U","u"],
+                ["V","v"],
+                ["W","w"],
+                ["X","x"],
+                ["Y","y"],
+                ["Z","z","2"],
+            ]
+
+            new_flag=""
+            for character in flag:
+                if(character in alphabet):
+                    new_flag += random.choice(dictionary[ord(character)-97])
+                elif(character in alphabet_capital):
+                    new_flag += random.choice(dictionary[ord(character)-65])
+                else:
+                    new_flag += character
+            if(len(new_flag)+2 < flag_len):
+                new_flag+="_"
+                for x in range(flag_len - len(new_flag)):
+                    # print(random.choice(random.choice(dictionary)))
+                    new_flag += random.choice(random.choice(dictionary))
+            return new_flag.replace(" ","_")
+        
+        generate_flag = Constant(generate_flag)
+        self.callables['genflag'] = generate_flag
+
+
+
+
+
         def password(length=16):
             pwdchrs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghjkmnopqrstuvwxyz0123456789'
             return ''.join(random.choice(pwdchrs) for _ in range(length))
@@ -98,57 +154,6 @@ class SuperCalculatorCommand(sublime_plugin.TextCommand):
         self.regex = r'(%s)((%s|[ ])*(%s))?' % (allowed, allowed, allowed)
         self.dict = self.callables.copy()
         self.dict.update(self.constants)
-
-        def generate_flag(flag, flag_len=16):
-            alphabet="abcdefghijklmnopqrstuvwxyz"
-            alphabet_capital="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-            dictionary=[
-                ["A","a","4","@"],
-                ["B","b","8","6"],
-                ["C","c"],
-                ["D","d"],
-                ["E","e","3"],
-                ["F","f"],
-                ["G","g","9"],
-                ["H","h"],
-                ["I","i","1"],
-                ["J","j"],
-                ["K","k"],
-                ["L","l","1"],
-                ["M","m"],
-                ["N","n"],
-                ["O","o","0"],
-                ["P","p"],
-                ["Q","q"],
-                ["R","r"],
-                ["S","s","5"],
-                ["T","t","7"],
-                ["U","u"],
-                ["V","v"],
-                ["W","w"],
-                ["X","x"],
-                ["Y","y"],
-                ["Z","z","2"],
-            ]
-
-            new_flag=""
-            for character in flag:
-                if(character in alphabet):
-                    new_flag += random.choice(dictionary[ord(character)-97])
-                elif(character in alphabet_capital):
-                    new_flag += random.choice(dictionary[ord(character)-65])
-                else:
-                    new_flag += character
-            if(len(new_flag)+2 < flag_len):
-                new_flag+="_"
-                for x in range(flag_len - len(new_flag)):
-                    # print(random.choice(random.choice(dictionary)))
-                    new_flag += random.choice(random.choice(dictionary))
-            return new_flag.replace(" ","_")
-        generate_flag = Constant(generate_flag)
-        self.callables['flag'] = generate_flag
-
 
     def run(self, edit):
         result_regions = []
