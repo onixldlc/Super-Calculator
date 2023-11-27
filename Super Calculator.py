@@ -60,29 +60,34 @@ class SuperCalculatorCommand(sublime_plugin.TextCommand):
         # self.constants['PASSWORD'] = password
 
 
-        def unhex(text):
-            return unhexlify(str(hexlify))
-        def hexlify(text):
-            return hexlify(str(hexlify))
+        def unhexing(text):
+            return unhexlify(text.encode('utf-8')).decode('utf-8')
+        def hexing(text):
+            return hexlify(text.encode('utf-8')).decode('utf-8')
 
         def intUnhex(num):
             return unhexlify(int(num))
         def intHex(num):
             return hexlify(int(num))
 
-        unhex = Constant(unhex)
-        hexlify = Constant(hexlify)
+        def b64dec(str_in):
+            return b64decode(str_in.encode('utf-8')).decode('utf-8')
+        def b64enc(str_in):
+            return b64encode(str_in.encode('utf-8')).decode('utf-8')
+
+        unhexing = Constant(unhexing)
+        hexing = Constant(hexing)
         intUnhex = Constant(intUnhex)
         intHex = Constant(intHex)
-        b64decode = Constant(b64decode)
-        b64encode = Constant(b64encode)
+        b64dec = Constant(b64dec)
+        b64enc = Constant(b64enc)
 
-        self.callables['unhex'] = unhex
-        self.callables['hex'] = hexlify
+        self.callables['unhex'] = unhexing
+        self.callables['hex'] = hexing
         self.callables['intunhex'] = intUnhex
         self.callables['inthex'] = intHex
-        self.callables['b64e'] = b64encode
-        self.callables['b64d'] = b64decode
+        self.callables['atob'] = b64dec
+        self.callables['btoa'] = b64enc
 
         allowed = '|'.join(
             [r'[-+*/%%()]'] +
@@ -93,6 +98,57 @@ class SuperCalculatorCommand(sublime_plugin.TextCommand):
         self.regex = r'(%s)((%s|[ ])*(%s))?' % (allowed, allowed, allowed)
         self.dict = self.callables.copy()
         self.dict.update(self.constants)
+
+        def generate_flag(flag, flag_len=16):
+            alphabet="abcdefghijklmnopqrstuvwxyz"
+            alphabet_capital="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+            dictionary=[
+                ["A","a","4","@"],
+                ["B","b","8","6"],
+                ["C","c"],
+                ["D","d"],
+                ["E","e","3"],
+                ["F","f"],
+                ["G","g","9"],
+                ["H","h"],
+                ["I","i","1"],
+                ["J","j"],
+                ["K","k"],
+                ["L","l","1"],
+                ["M","m"],
+                ["N","n"],
+                ["O","o","0"],
+                ["P","p"],
+                ["Q","q"],
+                ["R","r"],
+                ["S","s","5"],
+                ["T","t","7"],
+                ["U","u"],
+                ["V","v"],
+                ["W","w"],
+                ["X","x"],
+                ["Y","y"],
+                ["Z","z","2"],
+            ]
+
+            new_flag=""
+            for character in flag:
+                if(character in alphabet):
+                    new_flag += random.choice(dictionary[ord(character)-97])
+                elif(character in alphabet_capital):
+                    new_flag += random.choice(dictionary[ord(character)-65])
+                else:
+                    new_flag += character
+            if(len(new_flag)+2 < flag_len):
+                new_flag+="_"
+                for x in range(flag_len - len(new_flag)):
+                    # print(random.choice(random.choice(dictionary)))
+                    new_flag += random.choice(random.choice(dictionary))
+            return new_flag.replace(" ","_")
+        generate_flag = Constant(generate_flag)
+        self.callables['flag'] = generate_flag
+
 
     def run(self, edit):
         result_regions = []
